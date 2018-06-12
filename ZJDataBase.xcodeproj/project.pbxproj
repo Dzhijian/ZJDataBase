@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0431C77120CED0C9006F57DB /* ZJDataBaseTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 0431C77020CED0C9006F57DB /* ZJDataBaseTool.m */; };
+		0431C7A720D00EA8006F57DB /* ZJDBModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0431C7A620D00EA8006F57DB /* ZJDBModel.m */; };
 		04E2262420CD8EF500643322 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 04E2262320CD8EF500643322 /* AppDelegate.m */; };
 		04E2262720CD8EF500643322 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 04E2262620CD8EF500643322 /* ViewController.m */; };
 		04E2262A20CD8EF500643322 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 04E2262820CD8EF500643322 /* Main.storyboard */; };
@@ -39,6 +41,11 @@
 
 /* Begin PBXFileReference section */
 		0151ACA2A6516772641042F2 /* Pods-ZJDataBaseTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZJDataBaseTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-ZJDataBaseTests/Pods-ZJDataBaseTests.release.xcconfig"; sourceTree = "<group>"; };
+		0431C76D20CE8D79006F57DB /* PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
+		0431C76F20CED0C9006F57DB /* ZJDataBaseTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZJDataBaseTool.h; sourceTree = "<group>"; };
+		0431C77020CED0C9006F57DB /* ZJDataBaseTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZJDataBaseTool.m; sourceTree = "<group>"; };
+		0431C7A520D00EA8006F57DB /* ZJDBModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZJDBModel.h; sourceTree = "<group>"; };
+		0431C7A620D00EA8006F57DB /* ZJDBModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZJDBModel.m; sourceTree = "<group>"; };
 		04E2261F20CD8EF500643322 /* ZJDataBase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZJDataBase.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		04E2262220CD8EF500643322 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		04E2262320CD8EF500643322 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -93,6 +100,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0431C76E20CECF90006F57DB /* ZJDataBase */ = {
+			isa = PBXGroup;
+			children = (
+				0431C76F20CED0C9006F57DB /* ZJDataBaseTool.h */,
+				0431C77020CED0C9006F57DB /* ZJDataBaseTool.m */,
+				0431C7A520D00EA8006F57DB /* ZJDBModel.h */,
+				0431C7A620D00EA8006F57DB /* ZJDBModel.m */,
+			);
+			path = ZJDataBase;
+			sourceTree = "<group>";
+		};
 		04E2261620CD8EF500643322 = {
 			isa = PBXGroup;
 			children = (
@@ -118,6 +136,7 @@
 		04E2262120CD8EF500643322 /* ZJDataBase */ = {
 			isa = PBXGroup;
 			children = (
+				0431C76E20CECF90006F57DB /* ZJDataBase */,
 				04E2262220CD8EF500643322 /* AppDelegate.h */,
 				04E2262320CD8EF500643322 /* AppDelegate.m */,
 				04E2262520CD8EF500643322 /* ViewController.h */,
@@ -127,6 +146,7 @@
 				04E2262D20CD8EF700643322 /* LaunchScreen.storyboard */,
 				04E2263020CD8EF700643322 /* Info.plist */,
 				04E2263120CD8EF700643322 /* main.m */,
+				0431C76D20CE8D79006F57DB /* PrefixHeader.pch */,
 			);
 			path = ZJDataBase;
 			sourceTree = "<group>";
@@ -364,6 +384,8 @@
 			files = (
 				04E2262720CD8EF500643322 /* ViewController.m in Sources */,
 				04E2263220CD8EF700643322 /* main.m in Sources */,
+				0431C77120CED0C9006F57DB /* ZJDataBaseTool.m in Sources */,
+				0431C7A720D00EA8006F57DB /* ZJDBModel.m in Sources */,
 				04E2262420CD8EF500643322 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -536,8 +558,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = R65337KS8W;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = ZJDataBase/PrefixHeader.pch;
 				INFOPLIST_FILE = ZJDataBase/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = codeDeng.ZJDataBase;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -551,8 +578,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = R65337KS8W;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = ZJDataBase/PrefixHeader.pch;
 				INFOPLIST_FILE = ZJDataBase/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = codeDeng.ZJDataBase;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -567,7 +599,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = R65337KS8W;
 				INFOPLIST_FILE = ZJDataBaseTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = codeDeng.ZJDataBaseTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -583,7 +619,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = R65337KS8W;
 				INFOPLIST_FILE = ZJDataBaseTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = codeDeng.ZJDataBaseTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -598,7 +638,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = R65337KS8W;
 				INFOPLIST_FILE = ZJDataBaseUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = codeDeng.ZJDataBaseUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -613,7 +657,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = R65337KS8W;
 				INFOPLIST_FILE = ZJDataBaseUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = codeDeng.ZJDataBaseUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
