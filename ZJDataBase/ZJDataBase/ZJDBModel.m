@@ -166,6 +166,50 @@
 }
 
 
+-(BOOL)save{
+    NSString *tableName = NSStringFromClass(self.class);
+    NSMutableString *keyString = [NSMutableString string];
+    NSMutableString *valueString = [NSMutableString string];
+    NSMutableArray *insertValues = [NSMutableArray array];
+    for (int i = 0; i<self.columeNames.count; i++) {
+        NSString *proname = [self.columeNames objectAtIndex:i];
+        if ([proname isEqualToString:primaryId]) {
+            continue;
+        }
+        
+        [keyString appendFormat:@"%@,",proname];
+        [valueString appendString:@"?,"];
+        
+        id value = [self valueForKey:proname];
+        if (!value) {
+            value = @"";
+            
+        }
+        
+        [insertValues addObject:value];
+        
+    }
+    
+    // 去掉最后的逗号 ,
+    [keyString deleteCharactersInRange:NSMakeRange(keyString.length -1, 1)];
+    [valueString deleteCharactersInRange:NSMakeRange(valueString.length -1, 1)];
+    
+    ZJDataBaseTool *zjDB = [ZJDataBaseTool shareInstance];
+    
+    __block BOOL res  = NO;
+    [zjDB.dbQueue inDatabase:^(FMDatabase * _Nonnull db) {
+        NSString *sql = [NSString stringWithFormat:@"INSERT INTO %@(%@) VALUES (%@);", tableName, keyString, valueString];
+        res = [db executeUpdate:sql withArgumentsInArray:insertValues];
+        self.pk = res ? [NSNumber numberWithUnsignedLongLong:db.lastInsertRowId].intValue : 0;
+        NSLog(res ? @"插入成功" : @"插入失败");
+        
+    }];
+    
+    return res;
+}
+
+
+
 
 #pragma mark - util method
 + (NSString *)getColumeAndTypeString
@@ -186,9 +230,333 @@
     return pars;
 }
 
+- (BOOL)saveOrUpdate
+{
+    id primaryValue = [self valueForKey:primaryId];
+    if ([primaryValue intValue] <= 0) {
+        return [self save];
+    }
+    
+    return [self update];
+}
+
+- (BOOL)saveOrUpdateByColumnName:(NSString*)columnName AndColumnValue:(NSString*)columnValue
+{
+    id record = [self.class findFirstByCriteria:[NSString stringWithFormat:@"where %@ = %@",columnName,columnValue]];
+    if (record) {
+        id primaryValue = [record valueForKey:primaryId]; //取到了主键PK
+        if ([primaryValue intValue] <= 0) {
+            return [self save];
+        }else{
+            self.pk = [primaryValue integerValue];
+            return [self update];
+        }
+    }else{
+        return [self save];
+    }
+}
+/** 更新单个对象 */
+- (BOOL)update
+{
+    ZJDataBaseTool *zjDB = [ZJDataBaseTool shareInstance];
+    __block BOOL res = NO;
+    [zjDB.dbQueue inDatabase:^(FMDatabase *db) {
+        NSString *tableName = NSStringFromClass(self.class);
+        id primaryValue = [self valueForKey:primaryId];
+        if (!primaryValue || primaryValue <= 0) {
+            return ;
+        }
+        NSMutableString *keyString = [NSMutableString string];
+        NSMutableArray *updateValues = [NSMutableArray  array];
+        for (int i = 0; i < self.columeNames.count; i++) {
+            NSString *proname = [self.columeNames objectAtIndex:i];
+            if ([proname isEqualToString:primaryId]) {
+                continue;
+            }
+            [keyString appendFormat:@" %@=?,", proname];
+            id value = [self valueForKey:proname];
+            if (!value) {
+                value = @"";
+            }
+            [updateValues addObject:value];
+        }
+        
+        //删除最后那个逗号
+        [keyString deleteCharactersInRange:NSMakeRange(keyString.length - 1, 1)];
+        NSString *sql = [NSString stringWithFormat:@"UPDATE %@ SET %@ WHERE %@ = ?;", tableName, keyString, primaryId];
+        [updateValues addObject:primaryValue];
+        res = [db executeUpdate:sql withArgumentsInArray:updateValues];
+        NSLog(res?@"更新成功":@"更新失败");
+    }];
+    return res;
+}
+
+
+/** 批量更新用户对象*/
++ (BOOL)updateObjects:(NSArray *)array
+{
+    for (ZJDBModel *model in array) {
+        if (![model isKindOfClass:[ZJDBModel class]]) {
+            return NO;
+        }
+    }
+    __block BOOL res = YES;
+    ZJDataBaseTool *zjDB = [ZJDataBaseTool shareInstance];
+    // 如果要支持事务
+    [zjDB.dbQueue inTransaction:^(FMDatabase *db, BOOL *rollback) {
+        for (ZJDBModel *model in array) {
+            NSString *tableName = NSStringFromClass(model.class);
+            id primaryValue = [model valueForKey:primaryId];
+            if (!primaryValue || primaryValue <= 0) {
+                res = NO;
+                *rollback = YES;
+                return;
+            }
+            
+            NSMutableString *keyString = [NSMutableString string];
+            NSMutableArray *updateValues = [NSMutableArray  array];
+            for (int i = 0; i < model.columeNames.count; i++) {
+                NSString *proname = [model.columeNames objectAtIndex:i];
+                if ([proname isEqualToString:primaryId]) {
+                    continue;
+                }
+                [keyString appendFormat:@" %@=?,", proname];
+                id value = [model valueForKey:proname];
+                if (!value) {
+                    value = @"";
+                }
+                [updateValues addObject:value];
+            }
+            
+            //删除最后那个逗号
+            [keyString deleteCharactersInRange:NSMakeRange(keyString.length - 1, 1)];
+            NSString *sql = [NSString stringWithFormat:@"UPDATE %@ SET %@ WHERE %@=?;", tableName, keyString, primaryId];
+            [updateValues addObject:primaryValue];
+            BOOL flag = [db executeUpdate:sql withArgumentsInArray:updateValues];
+            NSLog(flag?@"更新成功":@"更新失败");
+            if (!flag) {
+                res = NO;
+                *rollback = YES;
+                return;
+            }
+        }
+    }];
+    
+    return res;
+}
+
+/** 删除单个对象 */
+- (BOOL)deleteObject
+{
+    ZJDataBaseTool *zjDB = [ZJDataBaseTool shareInstance];
+    __block BOOL res = NO;
+    [zjDB.dbQueue inDatabase:^(FMDatabase *db) {
+        NSString *tableName = NSStringFromClass(self.class);
+        id primaryValue = [self valueForKey:primaryId];
+        if (!primaryValue || primaryValue <= 0) {
+            return ;
+        }
+        NSString *sql = [NSString stringWithFormat:@"DELETE FROM %@ WHERE %@ = ?",tableName,primaryId];
+        res = [db executeUpdate:sql withArgumentsInArray:@[primaryValue]];
+        NSLog(res?@"删除成功":@"删除失败");
+    }];
+    return res;
+}
+
+/** 批量删除用户对象 */
++ (BOOL)deleteObjects:(NSArray *)array
+{
+    for (ZJDBModel *model in array) {
+        if (![model isKindOfClass:[ZJDBModel class]]) {
+            return NO;
+        }
+    }
+    
+    __block BOOL res = YES;
+    ZJDataBaseTool *zjDB = [ZJDataBaseTool shareInstance];
+    // 如果要支持事务
+    [zjDB.dbQueue inTransaction:^(FMDatabase *db, BOOL *rollback) {
+        for (ZJDBModel *model in array) {
+            NSString *tableName = NSStringFromClass(model.class);
+            id primaryValue = [model valueForKey:primaryId];
+            if (!primaryValue || primaryValue <= 0) {
+                return ;
+            }
+            
+            NSString *sql = [NSString stringWithFormat:@"DELETE FROM %@ WHERE %@ = ?",tableName,primaryId];
+            BOOL flag = [db executeUpdate:sql withArgumentsInArray:@[primaryValue]];
+            NSLog(flag?@"删除成功":@"删除失败");
+            if (!flag) {
+                res = NO;
+                *rollback = YES;
+                return;
+            }
+        }
+    }];
+    return res;
+}
+
+/** 通过条件删除数据 */
++ (BOOL)deleteObjectsByCriteria:(NSString *)criteria
+{
+    ZJDataBaseTool *zjDB = [ZJDataBaseTool shareInstance];
+    __block BOOL res = NO;
+    [zjDB.dbQueue inDatabase:^(FMDatabase *db) {
+        NSString *tableName = NSStringFromClass(self.class);
+        NSString *sql = [NSString stringWithFormat:@"DELETE FROM %@ %@ ",tableName,criteria];
+        res = [db executeUpdate:sql];
+        NSLog(res?@"删除成功":@"删除失败");
+    }];
+    return res;
+}
+
+/** 通过条件删除 (多参数）--2 */
++ (BOOL)deleteObjectsWithFormat:(NSString *)format, ...
+{
+    va_list ap;
+    va_start(ap, format);
+    NSString *criteria = [[NSString alloc] initWithFormat:format locale:[NSLocale currentLocale] arguments:ap];
+    va_end(ap);
+    
+    return [self deleteObjectsByCriteria:criteria];
+}
+
+/** 清空表 */
++ (BOOL)clearTable
+{
+    ZJDataBaseTool *zjDB = [ZJDataBaseTool shareInstance];
+    __block BOOL res = NO;
+    [zjDB.dbQueue inDatabase:^(FMDatabase *db) {
+        NSString *tableName = NSStringFromClass(self.class);
+        NSString *sql = [NSString stringWithFormat:@"DELETE FROM %@",tableName];
+        res = [db executeUpdate:sql];
+        NSLog(res?@"清空成功":@"清空失败");
+    }];
+    return res;
+}
+
+/** 查询全部数据 */
++ (NSArray *)findAll
+{
+    NSLog(@"zjDB---%s",__func__);
+    ZJDataBaseTool *zjDB = [ZJDataBaseTool shareInstance];
+    NSMutableArray *users = [NSMutableArray array];
+    [zjDB.dbQueue inDatabase:^(FMDatabase *db) {
+        NSString *tableName = NSStringFromClass(self.class);
+        NSString *sql = [NSString stringWithFormat:@"SELECT * FROM %@",tableName];
+        FMResultSet *resultSet = [db executeQuery:sql];
+        while ([resultSet next]) {
+            ZJDBModel *model = [[self.class alloc] init];
+            for (int i=0; i< model.columeNames.count; i++) {
+                NSString *columeName = [model.columeNames objectAtIndex:i];
+                NSString *columeType = [model.columeTypes objectAtIndex:i];
+                if ([columeType isEqualToString:SQLTEXT]) {
+                    [model setValue:[resultSet stringForColumn:columeName] forKey:columeName];
+                } else if ([columeType isEqualToString:SQLBLOB]) {
+                    [model setValue:[resultSet dataForColumn:columeName] forKey:columeName];
+                } else {
+                    [model setValue:[NSNumber numberWithLongLong:[resultSet longLongIntForColumn:columeName]] forKey:columeName];
+                }
+            }
+            [users addObject:model];
+            FMDBRelease(model);
+        }
+    }];
+    
+    return users;
+}
 
 
 
++ (instancetype)findFirstWithFormat:(NSString *)format, ...
+{
+    va_list ap;
+    va_start(ap, format);
+    NSString *criteria = [[NSString alloc] initWithFormat:format locale:[NSLocale currentLocale] arguments:ap];
+    va_end(ap);
+    
+    return [self findFirstByCriteria:criteria];
+}
 
+/** 查找某条数据 */
++ (instancetype)findFirstByCriteria:(NSString *)criteria
+{
+    NSArray *results = [self.class findByCriteria:criteria];
+    if (results.count < 1) {
+        return nil;
+    }
+    
+    return [results firstObject];
+}
+
++ (instancetype)findByPK:(int)inPk
+{
+    NSString *condition = [NSString stringWithFormat:@"WHERE %@=%d",primaryId,inPk];
+    return [self findFirstByCriteria:condition];
+}
+
++ (NSArray *)findWithFormat:(NSString *)format, ...
+{
+    va_list ap;
+    va_start(ap, format);
+    NSString *criteria = [[NSString alloc] initWithFormat:format locale:[NSLocale currentLocale] arguments:ap];
+    va_end(ap);
+    
+    return [self findByCriteria:criteria];
+}
+
+/** 通过条件查找数据 */
++ (NSArray *)findByCriteria:(NSString *)criteria
+{
+    ZJDataBaseTool *zjDB = [ZJDataBaseTool shareInstance];
+    NSMutableArray *users = [NSMutableArray array];
+    [zjDB.dbQueue inDatabase:^(FMDatabase *db) {
+        NSString *tableName = NSStringFromClass(self.class);
+        NSString *sql = [NSString stringWithFormat:@"SELECT * FROM %@ %@",tableName,criteria];
+        FMResultSet *resultSet = [db executeQuery:sql];
+        while ([resultSet next]) {
+            ZJDBModel *model = [[self.class alloc] init];
+            for (int i=0; i< model.columeNames.count; i++) {
+                NSString *columeName = [model.columeNames objectAtIndex:i];
+                NSString *columeType = [model.columeTypes objectAtIndex:i];
+                if ([columeType isEqualToString:SQLTEXT]) {
+                    [model setValue:[resultSet stringForColumn:columeName] forKey:columeName];
+                } else if ([columeType isEqualToString:SQLBLOB]) {
+                    [model setValue:[resultSet dataForColumn:columeName] forKey:columeName];
+                } else {
+                    [model setValue:[NSNumber numberWithLongLong:[resultSet longLongIntForColumn:columeName]] forKey:columeName];
+                }
+            }
+            [users addObject:model];
+            FMDBRelease(model);
+        }
+    }];
+    
+    return users;
+}
+
+
+- (NSString *)description
+{
+    NSString *result = @"";
+    NSDictionary *dict = [self.class getAllProperties];
+    NSMutableArray *proNames = [dict objectForKey:@"name"];
+    for (int i = 0; i < proNames.count; i++) {
+        NSString *proName = [proNames objectAtIndex:i];
+        id  proValue = [self valueForKey:proName];
+        result = [result stringByAppendingFormat:@"%@:%@\n",proName,proValue];
+    }
+    return result;
+}
+
+
+
+#pragma mark - must be override method
+/** 如果子类中有一些property不需要创建数据库字段，那么这个方法必须在子类中重写
+ */
++ (NSArray *)transients
+{
+    return [NSArray array];
+}
 
 @end
