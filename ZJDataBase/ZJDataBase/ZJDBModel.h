@@ -12,7 +12,7 @@
 @interface ZJDBModel : NSObject
 
 /** 主键 id */
-@property (nonatomic, assign)   int        pk;
+@property (nonatomic, assign)   NSInteger        pk;
 /** 列名 */
 @property (retain, readonly, nonatomic) NSMutableArray         *columeNames;
 /** 列类型 */

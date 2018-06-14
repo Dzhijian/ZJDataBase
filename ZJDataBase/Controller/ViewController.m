@@ -12,12 +12,16 @@
 #import "ZJDataBaseTool.h"
 #import "ZJDBModel.h"
 #import "ZJPersonCell.h"
+#import "ZJDBHeadView.h"
 
 @interface ViewController ()<UITableViewDelegate,UITableViewDataSource>
 
 @property (nonatomic, strong) UITableView *mainTable;
 
 @property (nonatomic, strong) NSMutableArray *dataSource;
+
+@property (nonatomic, strong) ZJDBHeadView *headView;
+
 
 @end
 
@@ -35,12 +39,55 @@
     [self.view addSubview:self.mainTable];
     
     self.mainTable.rowHeight = 130;
-    [self loadData];
+//    [self loadData];
     
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"刷新" style:(UIBarButtonItemStylePlain) target:self action:@selector(loadData)];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"添加数据" style:(UIBarButtonItemStylePlain) target:self action:@selector(addData)];
+//    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"刷新" style:(UIBarButtonItemStylePlain) target:self action:@selector(loadData)];
+//    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"添加数据" style:(UIBarButtonItemStylePlain) target:self action:@selector(addData)];
+    self.mainTable.tableHeaderView = self.headView;
+    [self btnAction];
+}
+
+
+-(void)btnAction{
+    
+    
+    __weak __typeof(self) weakObject = self;
+    
+    self.headView.selectedBtnBlock = ^(UIButton *sender) {
+        [weakObject loadData];
+    };
+    
+    self.headView.addDataBtnBlock = ^(UIButton *sender) {
+        [weakObject addData];
+    };
+    
+    self.headView.insertBtnBlock = ^(UIButton *sender) {
+        
+    };
+    
+    self.headView.deleteBtnBlock = ^(UIButton *sender) {
+        
+    };
+    
     
 }
+
+-(void)addData{
+    UIImage *image = [UIImage imageNamed:@"avataricon"];
+    NSData *imgDatae = UIImagePNGRepresentation(image);
+    
+    for (int i = 0;  i < 10; i++) {
+        Person *p = [[Person alloc]init];
+        
+        p.age = 16 + i;
+        p.name = [NSString stringWithFormat:@"张三%d",i];
+        p.avatarData = imgDatae;
+        p.gender = i%2 ? @"男" : @"女";
+        [p save];
+    }
+    
+}
+
 
 -(void)loadData{
     self.dataSource = (NSMutableArray *)[Person findAll];
@@ -59,25 +106,19 @@
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     ZJPersonCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ZJPersonCell"];
     [cell configWithPerson:self.dataSource[indexPath.row]];
+    
     return cell;
 }
 
 
 
--(void)addData{
-    UIImage *image = [UIImage imageNamed:@"avataricon"];
-    NSData *imgDatae = UIImagePNGRepresentation(image);
-    
-    for (int i = 0;  i < 10; i++) {
-        Person *p = [[Person alloc]init];
-        
-        p.age = 16 + i;
-        p.name = [NSString stringWithFormat:@"张三%d",i];
-        p.avatarData = imgDatae;
-        p.gender = i%2 ? @"男" : @"女";
-        [p save];
+
+-(ZJDBHeadView *)headView{
+    if (!_headView) {
+        _headView = [[ZJDBHeadView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 150)];
+        _headView.backgroundColor = [UIColor whiteColor];
     }
-    
+    return _headView;
 }
 
 -(NSMutableArray *)dataSource{

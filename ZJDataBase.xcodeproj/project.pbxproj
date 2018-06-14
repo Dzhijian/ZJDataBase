@@ -12,6 +12,7 @@
 		0431C7AA20D10E4D006F57DB /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 0431C7A920D10E4D006F57DB /* Person.m */; };
 		0431C7B120D11190006F57DB /* ZJPersonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0431C7AF20D11190006F57DB /* ZJPersonCell.m */; };
 		0431C7B220D11190006F57DB /* ZJPersonCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0431C7B020D11190006F57DB /* ZJPersonCell.xib */; };
+		0431C7B520D2745D006F57DB /* ZJDBHeadView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0431C7B420D2745D006F57DB /* ZJDBHeadView.m */; };
 		04E2262420CD8EF500643322 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 04E2262320CD8EF500643322 /* AppDelegate.m */; };
 		04E2262720CD8EF500643322 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 04E2262620CD8EF500643322 /* ViewController.m */; };
 		04E2262A20CD8EF500643322 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 04E2262820CD8EF500643322 /* Main.storyboard */; };
@@ -54,6 +55,8 @@
 		0431C7AE20D11190006F57DB /* ZJPersonCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZJPersonCell.h; sourceTree = "<group>"; };
 		0431C7AF20D11190006F57DB /* ZJPersonCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZJPersonCell.m; sourceTree = "<group>"; };
 		0431C7B020D11190006F57DB /* ZJPersonCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ZJPersonCell.xib; sourceTree = "<group>"; };
+		0431C7B320D2745D006F57DB /* ZJDBHeadView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZJDBHeadView.h; sourceTree = "<group>"; };
+		0431C7B420D2745D006F57DB /* ZJDBHeadView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZJDBHeadView.m; sourceTree = "<group>"; };
 		04E2261F20CD8EF500643322 /* ZJDataBase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZJDataBase.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		04E2262220CD8EF500643322 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		04E2262320CD8EF500643322 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -119,6 +122,36 @@
 			path = ZJDataBase;
 			sourceTree = "<group>";
 		};
+		0431C7B620D27475006F57DB /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				04E2262520CD8EF500643322 /* ViewController.h */,
+				04E2262620CD8EF500643322 /* ViewController.m */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		0431C7B720D27482006F57DB /* View */ = {
+			isa = PBXGroup;
+			children = (
+				0431C7B320D2745D006F57DB /* ZJDBHeadView.h */,
+				0431C7B420D2745D006F57DB /* ZJDBHeadView.m */,
+				0431C7AE20D11190006F57DB /* ZJPersonCell.h */,
+				0431C7AF20D11190006F57DB /* ZJPersonCell.m */,
+				0431C7B020D11190006F57DB /* ZJPersonCell.xib */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		0431C7B920D27497006F57DB /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				0431C7A820D10E4D006F57DB /* Person.h */,
+				0431C7A920D10E4D006F57DB /* Person.m */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		04E2261620CD8EF500643322 = {
 			isa = PBXGroup;
 			children = (
@@ -145,21 +178,17 @@
 			isa = PBXGroup;
 			children = (
 				0431C76E20CECF90006F57DB /* ZJDataBase */,
+				0431C7B620D27475006F57DB /* Controller */,
+				0431C7B720D27482006F57DB /* View */,
+				0431C7B920D27497006F57DB /* Model */,
 				04E2262220CD8EF500643322 /* AppDelegate.h */,
 				04E2262320CD8EF500643322 /* AppDelegate.m */,
-				04E2262520CD8EF500643322 /* ViewController.h */,
-				04E2262620CD8EF500643322 /* ViewController.m */,
 				04E2262820CD8EF500643322 /* Main.storyboard */,
 				04E2262B20CD8EF700643322 /* Assets.xcassets */,
 				04E2262D20CD8EF700643322 /* LaunchScreen.storyboard */,
 				04E2263020CD8EF700643322 /* Info.plist */,
 				04E2263120CD8EF700643322 /* main.m */,
 				0431C76D20CE8D79006F57DB /* PrefixHeader.pch */,
-				0431C7A820D10E4D006F57DB /* Person.h */,
-				0431C7A920D10E4D006F57DB /* Person.m */,
-				0431C7AE20D11190006F57DB /* ZJPersonCell.h */,
-				0431C7AF20D11190006F57DB /* ZJPersonCell.m */,
-				0431C7B020D11190006F57DB /* ZJPersonCell.xib */,
 			);
 			path = ZJDataBase;
 			sourceTree = "<group>";
@@ -396,6 +425,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0431C7B520D2745D006F57DB /* ZJDBHeadView.m in Sources */,
 				0431C7AA20D10E4D006F57DB /* Person.m in Sources */,
 				04E2262720CD8EF500643322 /* ViewController.m in Sources */,
 				04E2263220CD8EF700643322 /* main.m in Sources */,
@@ -577,6 +607,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = ZJDataBase/PrefixHeader.pch;
 				INFOPLIST_FILE = ZJDataBase/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -597,6 +628,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = ZJDataBase/PrefixHeader.pch;
 				INFOPLIST_FILE = ZJDataBase/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
