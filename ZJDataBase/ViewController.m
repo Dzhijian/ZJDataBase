@@ -4,13 +4,13 @@
 //
 //  Created by 邓志坚 on 2018/6/11.
 //  Copyright © 2018年 邓志坚. All rights reserved.
+//  https://github.com/Dzhijian/ZJDataBase
 //
 
 #import "ViewController.h"
 #import "Person.h"
 #import "ZJDataBaseTool.h"
 #import "ZJDBModel.h"
-
 #import "ZJPersonCell.h"
 
 @interface ViewController ()<UITableViewDelegate,UITableViewDataSource>
@@ -24,8 +24,9 @@
 @implementation ViewController
 
 - (void)viewDidLoad {
-    
     [super viewDidLoad];
+    
+    self.title = @"ZJDBTool";
     self.mainTable = [[UITableView alloc]initWithFrame:CGRectMake(0, 64, self.view.frame.size.width, self.view.frame.size.height - 64) style:UITableViewStylePlain];
     self.mainTable.delegate = self;
     self.mainTable.dataSource = self;
@@ -35,10 +36,13 @@
     
     self.mainTable.rowHeight = 130;
     [self loadData];
+    
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"刷新" style:(UIBarButtonItemStylePlain) target:self action:@selector(loadData)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"添加数据" style:(UIBarButtonItemStylePlain) target:self action:@selector(addData)];
+    
 }
 
 -(void)loadData{
-    
     self.dataSource = (NSMutableArray *)[Person findAll];
     [self.mainTable reloadData];
 }

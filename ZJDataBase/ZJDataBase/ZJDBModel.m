@@ -4,6 +4,7 @@
 //
 //  Created by 邓志坚 on 2018/6/12.
 //  Copyright © 2018年 邓志坚. All rights reserved.
+//  GitHub : https://github.com/Dzhijian/ZJDataBase
 //
 
 #import "ZJDBModel.h"
@@ -165,7 +166,7 @@
     return res;
 }
 
-
+#pragma mark - 保存
 -(BOOL)save{
     NSString *tableName = NSStringFromClass(self.class);
     NSMutableString *keyString = [NSMutableString string];
@@ -230,6 +231,7 @@
     return pars;
 }
 
+#pragma mark - 保存或更新
 - (BOOL)saveOrUpdate
 {
     id primaryValue = [self valueForKey:primaryId];
@@ -240,6 +242,7 @@
     return [self update];
 }
 
+#pragma mark - 根据条件保存或更新
 - (BOOL)saveOrUpdateByColumnName:(NSString*)columnName AndColumnValue:(NSString*)columnValue
 {
     id record = [self.class findFirstByCriteria:[NSString stringWithFormat:@"where %@ = %@",columnName,columnValue]];
@@ -255,7 +258,55 @@
         return [self save];
     }
 }
-/** 更新单个对象 */
+/** 批量保存用户对象 */
++ (BOOL)saveObjects:(NSArray *)array
+{
+    //判断是否是JKBaseModel的子类
+    for (ZJDBModel *model in array) {
+        if (![model isKindOfClass:[ZJDBModel class]]) {
+            return NO;
+        }
+    }
+    
+    __block BOOL res = YES;
+    ZJDataBaseTool *zjDB = [ZJDataBaseTool shareInstance];
+    // 如果要支持事务
+    [zjDB.dbQueue inTransaction:^(FMDatabase *db, BOOL *rollback) {
+        for (ZJDBModel *model in array) {
+            NSString *tableName = NSStringFromClass(model.class);
+            NSMutableString *keyString = [NSMutableString string];
+            NSMutableString *valueString = [NSMutableString string];
+            NSMutableArray *insertValues = [NSMutableArray  array];
+            for (int i = 0; i < model.columeNames.count; i++) {
+                NSString *proname = [model.columeNames objectAtIndex:i];
+                if ([proname isEqualToString:primaryId]) {
+                    continue;
+                }
+                [keyString appendFormat:@"%@,", proname];
+                [valueString appendString:@"?,"];
+                id value = [model valueForKey:proname];
+                if (!value) {
+                    value = @"";
+                }
+                [insertValues addObject:value];
+            }
+            [keyString deleteCharactersInRange:NSMakeRange(keyString.length - 1, 1)];
+            [valueString deleteCharactersInRange:NSMakeRange(valueString.length - 1, 1)];
+            
+            NSString *sql = [NSString stringWithFormat:@"INSERT INTO %@(%@) VALUES (%@);", tableName, keyString, valueString];
+            BOOL flag = [db executeUpdate:sql withArgumentsInArray:insertValues];
+            model.pk = flag?[NSNumber numberWithLongLong:db.lastInsertRowId].intValue:0;
+            NSLog(flag?@"插入成功":@"插入失败");
+            if (!flag) {
+                res = NO;
+                *rollback = YES;
+                return;
+            }
+        }
+    }];
+    return res;
+}
+#pragma mark - 更新单个对象
 - (BOOL)update
 {
     ZJDataBaseTool *zjDB = [ZJDataBaseTool shareInstance];
@@ -292,7 +343,7 @@
 }
 
 
-/** 批量更新用户对象*/
+#pragma mark - 批量更新用户对象
 + (BOOL)updateObjects:(NSArray *)array
 {
     for (ZJDBModel *model in array) {
@@ -345,7 +396,7 @@
     return res;
 }
 
-/** 删除单个对象 */
+#pragma mark - 删除单个对象
 - (BOOL)deleteObject
 {
     ZJDataBaseTool *zjDB = [ZJDataBaseTool shareInstance];
@@ -363,7 +414,7 @@
     return res;
 }
 
-/** 批量删除用户对象 */
+#pragma mark - 批量删除用户对象
 + (BOOL)deleteObjects:(NSArray *)array
 {
     for (ZJDBModel *model in array) {
@@ -396,7 +447,7 @@
     return res;
 }
 
-/** 通过条件删除数据 */
+#pragma mark -  通过条件删除数据
 + (BOOL)deleteObjectsByCriteria:(NSString *)criteria
 {
     ZJDataBaseTool *zjDB = [ZJDataBaseTool shareInstance];
@@ -410,7 +461,7 @@
     return res;
 }
 
-/** 通过条件删除 (多参数）--2 */
+#pragma mark - 通过条件删除 (多参数）--2
 + (BOOL)deleteObjectsWithFormat:(NSString *)format, ...
 {
     va_list ap;
@@ -421,7 +472,7 @@
     return [self deleteObjectsByCriteria:criteria];
 }
 
-/** 清空表 */
+#pragma mark - 清空表
 + (BOOL)clearTable
 {
     ZJDataBaseTool *zjDB = [ZJDataBaseTool shareInstance];
@@ -435,7 +486,7 @@
     return res;
 }
 
-/** 查询全部数据 */
+#pragma mark -  查询全部数据
 + (NSArray *)findAll
 {
     NSLog(@"zjDB---%s",__func__);
@@ -467,7 +518,7 @@
 }
 
 
-
+#pragma mark - 查找
 + (instancetype)findFirstWithFormat:(NSString *)format, ...
 {
     va_list ap;
@@ -478,7 +529,7 @@
     return [self findFirstByCriteria:criteria];
 }
 
-/** 查找某条数据 */
+#pragma mark -  查找某条数据
 + (instancetype)findFirstByCriteria:(NSString *)criteria
 {
     NSArray *results = [self.class findByCriteria:criteria];
@@ -489,6 +540,7 @@
     return [results firstObject];
 }
 
+#pragma mark - 查找主键
 + (instancetype)findByPK:(int)inPk
 {
     NSString *condition = [NSString stringWithFormat:@"WHERE %@=%d",primaryId,inPk];
@@ -505,7 +557,7 @@
     return [self findByCriteria:criteria];
 }
 
-/** 通过条件查找数据 */
+#pragma mark - 通过条件查找数据
 + (NSArray *)findByCriteria:(NSString *)criteria
 {
     ZJDataBaseTool *zjDB = [ZJDataBaseTool shareInstance];
@@ -535,7 +587,7 @@
     return users;
 }
 
-
+#pragma mark - 打印
 - (NSString *)description
 {
     NSString *result = @"";

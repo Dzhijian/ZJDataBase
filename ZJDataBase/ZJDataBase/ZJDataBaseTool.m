@@ -4,6 +4,7 @@
 //
 //  Created by 邓志坚 on 2018/6/11.
 //  Copyright © 2018年 邓志坚. All rights reserved.
+//  GitHub : https://github.com/Dzhijian/ZJDataBase
 //
 
 #import "ZJDataBaseTool.h"
@@ -58,7 +59,7 @@ static ZJDataBaseTool *_instance = nil;
     NSString *docsdir = [NSSearchPathForDirectoriesInDomains( NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
     NSFileManager *filemanage = [NSFileManager defaultManager];
     if (directoryName == nil || directoryName.length == 0) {
-        docsdir = [docsdir stringByAppendingPathComponent:@"ZJBD"];
+        docsdir = [docsdir stringByAppendingPathComponent:@"ZJDB"];
     } else {
         docsdir = [docsdir stringByAppendingPathComponent:directoryName];
     }
