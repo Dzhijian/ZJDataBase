@@ -37,8 +37,6 @@
  * 如果已经创建，返回YES
  */
 + (BOOL)createTable;
-
-
 /** 保存或更新
  * 如果不存在主键，保存，
  * 有主键，则更新
@@ -87,9 +85,6 @@
 + (NSArray *)findByCriteria:(NSString *)criteria;
 
 
-#pragma mark - must be override method
-/** 如果子类中有一些property不需要创建数据库字段，那么这个方法必须在子类中重写
- */
 
 #pragma mark - must be override method
 /** 如果子类中有一些property不需要创建数据库字段，那么这个方法必须在子类中重写

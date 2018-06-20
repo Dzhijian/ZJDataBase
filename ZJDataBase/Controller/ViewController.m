@@ -37,12 +37,8 @@
     self.mainTable.backgroundColor = [UIColor whiteColor];
     [self.mainTable registerNib:[UINib nibWithNibName:@"ZJPersonCell" bundle:nil] forCellReuseIdentifier:@"ZJPersonCell"];
     [self.view addSubview:self.mainTable];
-    
     self.mainTable.rowHeight = 130;
-//    [self loadData];
-    
-//    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"刷新" style:(UIBarButtonItemStylePlain) target:self action:@selector(loadData)];
-//    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"添加数据" style:(UIBarButtonItemStylePlain) target:self action:@selector(addData)];
+
     self.mainTable.tableHeaderView = self.headView;
     [self btnAction];
 }
@@ -62,16 +58,38 @@
     };
     
     self.headView.insertBtnBlock = ^(UIButton *sender) {
-        
+        [weakObject insertData];
     };
     
     self.headView.deleteBtnBlock = ^(UIButton *sender) {
-        
+        [weakObject deleteAllData];
     };
     
     
 }
 
+#pragma mark - 插入数据
+-(void)insertData{
+    Person *person = [[Person alloc]init];
+    
+    person.age = 18;
+    UIImage *image = [UIImage imageNamed:@"avataricon"];
+    NSData *imgDatae = UIImagePNGRepresentation(image);
+    person.avatarData = imgDatae;
+    person.name = @"CoderDeng";
+    person.gender = @"男";
+    [person saveOrUpdate];
+    [self loadData];
+}
+
+
+#pragma mark - 删除数据
+-(void)deleteAllData{
+    [Person deleteObjectsByCriteria:@""];
+    [self loadData];
+}
+
+#pragma mark - 添加数据
 -(void)addData{
     UIImage *image = [UIImage imageNamed:@"avataricon"];
     NSData *imgDatae = UIImagePNGRepresentation(image);
@@ -85,10 +103,10 @@
         p.gender = i%2 ? @"男" : @"女";
         [p save];
     }
-    
+    [self loadData];
 }
 
-
+#pragma mark -  加载数据,查询所有数据
 -(void)loadData{
     self.dataSource = (NSMutableArray *)[Person findAll];
     [self.mainTable reloadData];
